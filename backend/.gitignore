@@ -1,0 +1,28 @@
+# Binarios compilados
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+
+# Archivos de test
+*.test
+*.out
+
+# Dependencias de Go
+vendor/
+
+# Variables de entorno
+.env
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
