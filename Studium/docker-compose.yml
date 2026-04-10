@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: local_postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: studium
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/migrations:/app/migrations
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: local_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  backend:
+    build: ./backend
+    container_name: local_backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgres://admin:admin@postgres:5432/studium?sslmode=disable
+      - REDIS_URL=redis:6379
+      - JWT_SECRET=tu_secreto_super_seguro_cambiar_en_produccion
+      - PORT=8080
+      - ENVIRONMENT=development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    # command: go run cmd/server/main.go
+
+volumes:
+  postgres_data:
+  redis_data:
